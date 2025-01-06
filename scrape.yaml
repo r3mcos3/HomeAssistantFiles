@@ -8,6 +8,7 @@ scrape:
         unit_of_measurement: "€"
         icon: mdi:fuel
         unique_id: "euro95_poppel"
+        value_template: '{{ value | replace (" ", "") }}'
   - resource: https://www.vanraak.be/nl/professionals/tanken/baarle-hertog
     verify_ssl: false
     scan_interval: 86400
@@ -17,3 +18,4 @@ scrape:
         unit_of_measurement: "€"
         icon: mdi:fuel
         unique_id: "euro95_baarle_hertog"
+        value_template: '{{ value | replace (" ", "") }}'
