@@ -1,1 +1,1 @@
-{{now() >= states('sensor.pixel_8_pro_next_alarm') | as_datetime | as_local }}
+{{ now() >= states('sensor.pixel_8_pro_next_alarm') | as_datetime | as_local }}
