@@ -1,3 +1,5 @@
+# Scrape Sensors for fuel prizes in Poppel and Baarle-Hertog
+
 scrape:
   - resource: https://www.vanraak.be/nl/professionals/tanken/poppel
     verify_ssl: false
