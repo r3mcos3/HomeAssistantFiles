@@ -1,4 +1,5 @@
-# Template For Alarm Clock Automation
-
+# Template for alarm clock automation
 {{ now() >= states('sensor.pixel_8_pro_next_alarm') | as_datetime | as_local }}
 
+# Template to count lights
+{{ states.light | rejectattr('attributes.entity_id', 'defined') | selectattr('state', 'eq', 'on') | list | count }}
