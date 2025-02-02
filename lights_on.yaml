@@ -1,0 +1,3 @@
+
+# Template to count lights
+{{ states.light | rejectattr('attributes.entity_id', 'defined') | selectattr('state', 'eq', 'on') | list | count }}
