@@ -1,0 +1,447 @@
+blueprint:
+  name: Sentinel Sight
+  description: "# \U0001F916\U0001F3E0 AI-Powered Vigilance STANDARD\n## Supports
+    Cloud and Local AI providers\nCloud: **OpenAI**, **Anthropic**, **Google Gemini**,
+    **Groq**\nLocal: **Ollama**, **LocalAI**\n\n**Version: 2.2.0**\n- Support for
+    LLM Vision Integration v1.2.1\n\nNever miss a moment, always stay informed with
+    Sentinel Sight, your blueprint for AI-powered home awareness, transforms your
+    smart cameras into a hyper-aware observer using AI Vision Models.\nMake informed
+    decisions based on real-time information, even when you're not home.\nYou'll get
+    a notification with information the AI processed using the images from your camera,
+    with the option to access both the event’s recording and a live stream from your
+    camera.\n\nConsiderations:\n- It requires the [LLM Vision Integration](https://fixtse.com/blog/ai-vision-vigilance#llm-vision-integration)\n-
+    Remember to review the **AI Prompt** in the AI Section and add details about what
+    you want the AI to look for.\n- Check the Prompt Examples on our [website](https://fixtse.com/blog/ai-vision-vigilance#sentinel-sight-2)\n"
+  author: fixtse
+  source_url: https://gist.github.com/fixtse/f4bc05069295709ee1c20675853c3e0b
+  domain: automation
+  input:
+    main_settings:
+      name: Main
+      icon: mdi:camera
+      collapsed: true
+      input:
+        camera:
+          name: Camera
+          description: The camera from which the snapshot is captured
+          selector:
+            entity:
+              filter:
+              - domain:
+                - camera
+              multiple: false
+        person_device_tracker:
+          name: Persons
+          description: Person or persons to track. The automation will only be activated
+            when none of them are at home.
+          selector:
+            entity:
+              multiple: true
+              filter:
+              - domain:
+                - person
+        motion_sensor:
+          name: Trigger Sensors
+          description: Only one is needed to trigger the automation
+          selector:
+            entity:
+              multiple: true
+              filter:
+              - domain:
+                - binary_sensor
+        todo_list:
+          name: To-do List
+          description: List to store the snapshots names
+          selector:
+            entity:
+              filter:
+              - domain:
+                - todo
+              multiple: false
+    other_sensors:
+      name: Sensors
+      icon: mdi:motion-sensor
+      collapsed: true
+      input:
+        aditional_devices:
+          name: Aditional Devices
+          description: Select aditional devices to give the AI more context using
+            your sensors.
+          default: []
+          selector:
+            entity:
+              multiple: true
+    ai_settings:
+      name: AI
+      icon: mdi:robot
+      collapsed: true
+      input:
+        ai:
+          name: AI Provider
+          description: Configuration to use for the video_analyzer service. See docs
+            for additional information.
+          default: []
+          selector:
+            config_entry:
+              integration: llmvision
+        model:
+          name: Model
+          description: "The name of the model to be used Ej. ```gpt-4o-mini```, ```llava:latest```.
+            \nLeave empty to use default."
+          selector:
+            text:
+              multiline: false
+              multiple: false
+          default: []
+        prompt:
+          name: AI Prompt
+          selector:
+            text:
+              multiline: true
+              type: text
+              multiple: false
+          default: You are a security guard, Don't describe the scene, only let me
+            know if there is any security risk or not.
+        temperature:
+          name: Temperature
+          description: "This is the randomness of the AI response. \nThe higher the
+            value, the more random the response will be. \nThe lower the value, the
+            more predictable the response will be."
+          default: '0.1'
+          selector:
+            number:
+              min: 0.1
+              max: 1.0
+              mode: slider
+              step: 0.1
+        max_tokens:
+          name: Max Tokens
+          description: This controls how long the answer of the AI will be.
+          default: '100'
+          selector:
+            number:
+              min: 10.0
+              max: 1000.0
+              mode: slider
+              step: 1.0
+    notify_settings:
+      name: Notify
+      icon: mdi:message-badge
+      collapsed: true
+      input:
+        notify_device:
+          name: Mobile App Notify
+          description: Select the devices to be notified when the automation is triggered.
+          default: []
+          selector:
+            device:
+              filter:
+              - integration: mobile_app
+              multiple: true
+        notify_number:
+          name: How many aditional notify services do you want to use?
+          description: This is only necessary if you intend to use additional Notify
+            Services. (ej. Telegram)
+          default: zero
+          selector:
+            select:
+              options:
+              - label: '0'
+                value: zero
+              - label: '1'
+                value: one
+              - label: '2'
+                value: two
+              - label: '3'
+                value: three
+              multiple: false
+              custom_value: false
+              mode: dropdown
+              sort: false
+        notify_service_1:
+          name: First Notify service name
+          description: The name of the first notify service where the notification
+            should be sent.
+          selector:
+            text:
+              multiple: false
+              multiline: false
+          default: notify.notify_1
+        notify_service_2:
+          name: Second Notify service name
+          description: The name of the second notify service where the notification
+            should be sent.
+          selector:
+            text:
+              multiple: false
+              multiline: false
+          default: notify.notify_2
+        notify_service_3:
+          name: Third Notify service name
+          description: The name of the third notify service where the notification
+            should be sent.
+          selector:
+            text:
+              multiple: false
+              multiline: false
+          default: notify.notify_3
+    optional_settings:
+      name: Settings
+      icon: mdi:cog-outline
+      collapsed: true
+      input:
+        image_count:
+          name: Number of images
+          description: The number of images to sent to AI Vision
+          default: '5'
+          selector:
+            number:
+              min: 1.0
+              max: 16.0
+              unit_of_measurement: images
+              mode: slider
+              step: 1.0
+        video_time:
+          name: Duration of the video to be recorded
+          description: The camera stream determines the actual time recorded
+          default: '15'
+          selector:
+            number:
+              min: 10.0
+              max: 60.0
+              unit_of_measurement: seconds
+              mode: slider
+              step: 1.0
+        delay:
+          name: Delay (Optional)
+          description: Time to wait before taking the camera snapshot
+          default: '0'
+          selector:
+            number:
+              min: 0.0
+              max: 60.0
+              unit_of_measurement: seconds
+              mode: slider
+              step: 1.0
+    debug_settings:
+      name: Debug Settings
+      icon: mdi:alert
+      collapsed: true
+      input:
+        debug_mode:
+          name: Debug Mode
+          description: ⚠️ Use it to be able to trigger the automation manually for
+            testing
+          default: false
+          selector:
+            boolean: {}
+variables:
+  notify_number: !input notify_number
+  prompt: !input prompt
+  max_tokens: !input max_tokens
+  temperature: !input temperature
+  image_count: !input image_count
+  delay: !input delay
+  debug_mode: !input debug_mode
+  camera: !input camera
+  aditional_devices: !input aditional_devices
+  todo_list: !input todo_list
+  motion_sensor: !input motion_sensor
+  notify_device: !input notify_device
+  video_time: !input video_time
+  model: !input model
+  ai: !input ai
+trigger:
+- platform: state
+  entity_id: !input motion_sensor
+  from: 'off'
+  to: 'on'
+  id: motion_sensor
+- platform: state
+  entity_id: !input person_device_tracker
+  to: home
+  id: device_tracker_home
+action:
+- alias: Fetch Snapshots Names
+  response_variable: todo
+  service: todo.get_items
+  target:
+    entity_id: !input todo_list
+- variables:
+    snapshots_list: '{{ todo[todo_list][''items''] | map(attribute=''summary'') |
+      list  }}'
+- repeat:
+    for_each: '{{ snapshots_list }}'
+    sequence:
+    - service: todo.remove_item
+      target:
+        entity_id: !input todo_list
+      data:
+        item: '{{ repeat.item }}'
+- choose:
+  - alias: Capture snapshots
+    conditions:
+    - condition: or
+      conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id: motion_sensor
+        - condition: state
+          entity_id: !input person_device_tracker
+          state: not_home
+      - condition: template
+        value_template: '{{ debug_mode }}'
+    sequence:
+    - delay: '{{ delay }}'
+    - variables:
+        video_snapshot_create_file_path: video_snapshot_{{ states[camera].object_id
+          }}_{{ now().strftime('%M%S') }}.mp4
+    - parallel:
+      - service: camera.record
+        data:
+          duration: '{{ video_time }}'
+          entity_id: !input camera
+          filename: /config/www/tmp/{{ video_snapshot_create_file_path }}
+      - repeat:
+          count: '{{ image_count }}'
+          sequence:
+          - variables:
+              snapshot_create_file_path: snapshot_{{ states[camera].object_id }}_{{
+                now().strftime('%M%S') }}.jpg
+          - service: camera.snapshot
+            entity_id: !input camera
+            data:
+              filename: /config/www/tmp/{{ snapshot_create_file_path }}
+          - service: todo.add_item
+            data:
+              entity_id: !input todo_list
+              item: /config/www/tmp/{{ snapshot_create_file_path }}
+          - delay: 1
+    - alias: Fetch Snapshots Names
+      response_variable: todo
+      service: todo.get_items
+      target:
+        entity_id: !input todo_list
+    - variables:
+        snapshots_list2: '{{ todo[todo_list][''items''] | map(attribute=''summary'')
+          | list  }}'
+        new_prompt: "{{ prompt }}\n{%- if aditional_devices is defined %}\nYou could
+          use these devices, if any, to have more context of the situation:\n{%- for
+          aEntity in aditional_devices %}\n\"{{ state_attr(aEntity, 'friendly_name')
+          }} - {{ states(aEntity) }}\"            \n{%- endfor %}\nIf none, just use
+          the images provided \n{%- endif %}"
+    - choose:
+      - alias: Capture snapshots
+        conditions:
+        - condition: template
+          value_template: '{{ (model == []) }}'
+        sequence:
+        - service: llmvision.image_analyzer
+          data:
+            provider: !input ai
+            message: '{{ new_prompt }}'
+            image_file: "{%- if todo.items %}\n{% for row in snapshots_list2 %}\n{{
+              row }}{% endfor %}                          \n{%- endif %}"
+            temperature: '{{ temperature }}'
+            include_filename: false
+            max_tokens: '{{ max_tokens }}'
+          response_variable: agent
+      default:
+      - service: llmvision.image_analyzer
+        data:
+          provider: !input ai
+          message: '{{ new_prompt }}'
+          image_file: "{%- if todo.items %}\n{% for row in snapshots_list2 %}\n{{
+            row }}{% endfor %}                          \n{%- endif %}"
+          model: !input model
+          temperature: '{{ temperature }}'
+          include_filename: false
+          max_tokens: '{{ max_tokens }}'
+        response_variable: agent
+    - variables:
+        ai_response: '{{ agent.response_text  }}'
+    - alias: Send a notification to each device
+      repeat:
+        for_each: !input notify_device
+        sequence:
+        - service: notify.mobile_app_{{ device_attr(repeat.item, 'name') | slugify
+            }}
+          data:
+            title: '{{ now().strftime(''%A'') }} Security Overview'
+            message: '{{ ai_response }}'
+            data:
+              ttl: 0
+              priority: high
+              image: /local/tmp/{{ (snapshots_list2[0])[16:] }}
+              actions:
+              - action: URI
+                title: Recording
+                uri: /local/tmp/{{ video_snapshot_create_file_path }}
+              - action: URI
+                title: Live Feed
+                uri: /api/camera_proxy_stream/{{ camera }}?token={{ state_attr(camera,
+                  'access_token') }}
+    - if:
+      - condition: template
+        value_template: '{{ (notify_number == ''one'') or (notify_number == ''two'')
+          or (notify_number == ''three'') }}'
+      then:
+      - alias: Send notification
+        service: !input notify_service_1
+        data:
+          title: '{{ now().strftime(''%A'') }} Security Overview'
+          message: '{{ ai_response }}'
+      - alias: Send video
+        service: !input notify_service_1
+        data:
+          title: Video Recording
+          message: ''
+          data:
+            video:
+              file: /config/www/tmp/{{ video_snapshot_create_file_path }}
+    - if:
+      - condition: template
+        value_template: '{{ (notify_number == ''two'') or (notify_number == ''three'')
+          }}'
+      then:
+      - alias: Send notification
+        service: !input notify_service_2
+        data:
+          title: '{{ now().strftime(''%A'') }} Security Overview'
+          message: '{{ ai_response }}'
+      - alias: Send video
+        service: !input notify_service_2
+        data:
+          title: Video Recording
+          message: ''
+          data:
+            video:
+              file: /config/www/tmp/{{ video_snapshot_create_file_path }}
+    - if:
+      - condition: template
+        value_template: '{{ notify_number == ''three''}}'
+      then:
+      - alias: Send notification
+        service: !input notify_service_3
+        data:
+          title: '{{ now().strftime(''%A'') }} Security Overview'
+          message: '{{ ai_response }}'
+      - alias: Send video
+        service: !input notify_service_3
+        data:
+          title: Video Recording
+          message: ''
+          data:
+            video:
+              file: /config/www/tmp/{{ video_snapshot_create_file_path }}
+    - repeat:
+        for_each: '{{ snapshots_list2 }}'
+        sequence:
+        - service: todo.remove_item
+          target:
+            entity_id: !input todo_list
+          data:
+            item: '{{ repeat.item }}'
+mode: queued
+max_exceeded: silent
