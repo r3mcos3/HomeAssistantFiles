@@ -1,0 +1,27 @@
+type: custom:mushroom-template-card
+primary: |-
+  {% if is_state('person.remco', 'home') %}
+  Home
+  {% else %}
+  Away
+  {% endif %}
+secondary: >-
+  {{states('sensor.home_remco_distance') | round(1)}} km /
+  {{states('sensor.pixel_8_pro_battery_level')}} %
+icon: mdi:home
+entity: person.remco
+badge_icon: |-
+  {% if is_state('person.remco', 'home') %}
+  mdi:home
+  {% else  %}
+  mdi:home-export-outline
+  {%endif%}
+badge_color: |-
+  {% if is_state('person.remco', 'home') %}
+  orange
+  {% else  %}
+  grey
+  {%endif%}
+picture: /local/images/remco.jpg
+tap_action:
+  action: more-info
