@@ -1,0 +1,18 @@
+alias: Alarm Lights
+description: ""
+triggers:
+  - trigger: time
+    at:
+      entity_id: sensor.pixel_8_pro_next_alarm
+      offset: "-00:00:10"
+conditions: []
+actions:
+  - action: light.turn_on
+    metadata: {}
+    data:
+      brightness_pct: 33
+    target:
+      device_id: fd50cf17100138ff43638ed73dd1c5a2
+      entity_id: light.living_room_spots
+mode: single
+
