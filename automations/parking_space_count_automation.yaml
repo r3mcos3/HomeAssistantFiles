@@ -1,0 +1,68 @@
+alias: AI Parking Spot Count
+description: >-
+  Analyzes doorbell camera feed with AI to count free and occupied parking
+  spaces upon arrival, updating sensors and sending a notification.
+triggers:
+  - trigger: zone
+    entity_id: person.remco
+    zone: zone.huibevendreef
+    event: enter
+  - trigger: zone
+    entity_id: person.remco
+    zone: zone.moerse_dreef
+    event: enter
+actions:
+  - alias: Analyseer camera met AI
+    action: ai_task.generate_data
+    data:
+      instructions: >-
+        Look at this image of the street in front of my house. There are 3
+        parking spaces directly in front of the door. Count how many of these 3
+        spaces are FREE (no car parked) and how many are OCCUPIED (car parked).
+      structure:
+        vrije_plekken:
+          selector:
+            number:
+              min: 0
+              max: 3
+        bezette_plekken:
+          selector:
+            number:
+              min: 0
+              max: 3
+      entity_id: ai_task.google_ai_task
+      task_name: Scan Free Park Spaces
+      attachments:
+        media_content_id: media-source://camera/camera.doorbell_camera_generic
+        media_content_type: application/vnd.apple.mpegurl
+        metadata:
+          title: Doorbell Camera Generic
+          thumbnail: /api/camera_proxy/camera.doorbell_camera_generic
+          media_class: video
+          children_media_class: null
+          navigateIds:
+            - {}
+            - media_content_type: app
+              media_content_id: media-source://camera
+    response_variable: parking_result
+    enabled: true
+  - alias: Update vrije plekken
+    action: input_number.set_value
+    target:
+      entity_id: input_number.vrije_parkeerplekken
+    data:
+      value: "{{ parking_result.data.vrije_plekken | int(0) }}"
+  - alias: Update bezette plekken
+    action: input_number.set_value
+    target:
+      entity_id: input_number.bezette_parkeerplekken
+    data:
+      value: "{{ parking_result.data.bezette_plekken | int(0) }}"
+  - action: telegram_bot.send_message
+    metadata: {}
+    data:
+      config_entry_id: 01KB319JH3BYTR0K7PYGAEDJ6B
+      message: >-
+        Er zijn {{ states('input_number.vrije_parkeerplekken') | int(0) }}
+        parkeerplaatsen 🚗 vrij voor de deur!🚪
+mode: single
